@@ -124,23 +124,27 @@ BERT使用表示绝对位置的正余弦编码，可以在init方法中提前预
 
 #### 初始化
 核心公式
+
 $$ PE(pos,2i)=sin(pos/10000^{2i/dim}) $$
+
 $$ PE(pos,2i+1)=cos(pos/10000^{2i/dim}) $$
+
 其中pos表示单词在token序列中的位置，取值范围0 ~ token_len；i表示维度的位置，取值0 ~ dim；dim表示维度长度
 
 1. 首先创建[max_len, d_model]的全0tensor，后续在这上面做修改
 ```python
 pe = torch.zeros(max_len, d_model).float()
 ```
-2. 生成0~max_len-1的序列，然后扩充后的维度，变成[max_len, 1]，即0~max_len-1中每个数字一行，这表示单词在token序列中的位置，unsqueeze是为了后续的广播
+2. 生成0 ~ max_len-1的序列，然后扩充后的维度，变成[max_len, 1]，即0~max_len-1中每个数字一行，这表示单词在token序列中的位置，unsqueeze是为了后续的广播
 ```python
 position = torch.arange(0, max_len).float().unsqueeze(1)
 ```
-3. 借助log和exp计算$ 1/10000^{2i/dim} $的部分，div_term的shape为[d_model//2]
+3. 借助log和exp计算分数部分，div_term的shape为[d_model//2]
 ```python
 div_term = torch.exp(torch.arange(0, d_model, 2).float() * -(math.log(10000.0) / d_model))
 ```
 公式推理：
+
 $$ e^{(2i) \cdot -(log(10000)/ dim)}=\frac{1}{e^{\frac{2i \cdot log(10000)}{dim}}} $$
 
 分母单独拿出来
