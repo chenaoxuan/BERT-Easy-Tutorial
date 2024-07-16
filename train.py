@@ -21,16 +21,14 @@ def get_args() -> argparse.Namespace:
     parser.add_argument("-s", "--seq_len", type=int, default=20, help="maximum sequence len")
 
     parser.add_argument("-b", "--batch_size", type=int, default=1, help="number of batch_size")
-    parser.add_argument("-e", "--epochs", type=int, default=20, help="number of epochs")
+    parser.add_argument("-e", "--epochs", type=int, default=100, help="number of epochs")
 
     parser.add_argument("--cuda", action="store_true", help="training with CUDA")
     parser.add_argument("--log_freq", type=int, default=10, help="printing loss every n iter: setting n")
     parser.add_argument("--on_memory", type=bool, default=True, help="Loading on memory: true or false")
 
-    parser.add_argument("--lr", type=float, default=1e-4, help="learning rate of adam")
-    parser.add_argument("--weight_decay", type=float, default=0.01, help="weight_decay of adam")
-    parser.add_argument("--beta1", type=float, default=0.9, help="adam first beta value")
-    parser.add_argument("--beta2", type=float, default=0.999, help="adam first beta value")
+    parser.add_argument("--lr", type=float, default=1e-4, help="learning rate of Adam")
+    parser.add_argument("--weight_decay", type=float, default=0.01, help="weight_decay of Adam")
 
     return parser.parse_args()
 
@@ -53,7 +51,7 @@ if __name__ == '__main__':
     device = "cuda" if args.cuda and torch.cuda.is_available() else "cpu"
     model = BERTLM(bert, len(vocab)).to(device)
     criterion = nn.NLLLoss(ignore_index=0)
-    optimizer = Adam(model.parameters(), lr=args.lr, betas=(args.beta1, args.beta2), weight_decay=args.weight_decay)
+    optimizer = Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
 
     for cur_epoch in range(args.epochs):
         avg_loss = 0.0
