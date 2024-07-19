@@ -1,6 +1,6 @@
 # BERT-Easy-Tutorial
 
-<a href="README.md">English</a> | 简体中文</a>
+<a href="../README.md">English</a> | 简体中文</a>
 
 [![License](https://img.shields.io/badge/license-Apache%202.0-green.svg)](LICENSE)
 
