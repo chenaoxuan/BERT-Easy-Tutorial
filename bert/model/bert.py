@@ -1,6 +1,6 @@
 import torch.nn as nn
 
-from .encoder import Encoder
+from bert.model.transformer.encoder import Encoder
 from .embedding import TokenEmbedding, PositionalEmbedding, SegmentEmbedding
 
 
@@ -14,7 +14,7 @@ class BERT(nn.Module):
         :param vocab_size: vocab_size of total words
         :param hidden: BERT model hidden size
         :param n_layers: numbers of Transformer Encoders(layers)
-        :param attn_heads: number of attention heads
+        :param attn_heads: number of transformer heads
         :param dropout: dropout rate
         """
 
@@ -36,9 +36,10 @@ class BERT(nn.Module):
             [Encoder(hidden, attn_heads, hidden * 4, dropout) for _ in range(n_layers)])
 
     def forward(self, x, segment_info):
-        # attention masking for padded token
+        # transformer masking for padded token
         # torch.ByteTensor([batch_size, 1, seq_len, seq_len)
-        mask = (x > 0).unsqueeze(1).repeat(1, x.size(1), 1).unsqueeze(1)
+        # The value where a mask is required is False
+        mask = (x > 0).unsqueeze(1).repeat(1, x.size(1), 1)
 
         # embedding the indexed sequence to sequence of vectors
         x = self.token(x) + self.position(x) + self.segment(segment_info)

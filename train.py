@@ -1,12 +1,11 @@
 import argparse
 
-import torch
 import torch.nn as nn
 from torch.optim import Adam
 from torch.utils.data import DataLoader
 
 from bert.model import BERT, BERTLM
-from bert.dataset import BERTDataset, WordVocab
+from bert.dataset import WordVocab, BERTDataset
 
 
 def get_args() -> argparse.Namespace:
@@ -17,15 +16,12 @@ def get_args() -> argparse.Namespace:
 
     parser.add_argument("-hs", "--hidden", type=int, default=256, help="hidden size of bert model")
     parser.add_argument("-l", "--layers", type=int, default=8, help="number of layers")
-    parser.add_argument("-a", "--attn_heads", type=int, default=8, help="number of attention heads")
+    parser.add_argument("-a", "--attn_heads", type=int, default=8, help="number of transformer heads")
     parser.add_argument("-s", "--seq_len", type=int, default=20, help="maximum sequence len")
 
     parser.add_argument("-b", "--batch_size", type=int, default=1, help="number of batch_size")
     parser.add_argument("-e", "--epochs", type=int, default=100, help="number of epochs")
-
-    parser.add_argument("--cuda", action="store_true", help="training with CUDA")
     parser.add_argument("--log_freq", type=int, default=10, help="printing loss every n iter: setting n")
-    parser.add_argument("--on_memory", type=bool, default=True, help="Loading on memory: true or false")
 
     parser.add_argument("--lr", type=float, default=1e-4, help="learning rate of Adam")
     parser.add_argument("--weight_decay", type=float, default=0.01, help="weight_decay of Adam")
@@ -40,16 +36,15 @@ if __name__ == '__main__':
     print("Vocab Size: ", len(vocab))
 
     print("Loading Dataset", args.train_dataset)
-    train_dataset = BERTDataset(args.train_dataset, vocab, seq_len=args.seq_len, on_memory=args.on_memory)
+    train_dataset = BERTDataset(args.train_dataset, vocab, seq_len=args.seq_len)
 
     print("Creating Dataloader")
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size)
 
     print("Building BERT model")
     bert = BERT(len(vocab), hidden=args.hidden, n_layers=args.layers, attn_heads=args.attn_heads)
+    model = BERTLM(bert, len(vocab))
 
-    device = "cuda" if args.cuda and torch.cuda.is_available() else "cpu"
-    model = BERTLM(bert, len(vocab)).to(device)
     criterion = nn.NLLLoss(ignore_index=0)
     optimizer = Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
 
@@ -58,8 +53,6 @@ if __name__ == '__main__':
         total_correct = 0
         total_element = 0
         for i, data in enumerate(train_loader):
-            # 0. batch_data will be sent into the device(GPU or cpu)
-            data = {key: value.to(device) for key, value in data.items()}
 
             # 1. forward the next_sentence_prediction and masked_lm model
             next_sent_output, mask_lm_output = model.forward(data["bert_input"], data["segment_label"])

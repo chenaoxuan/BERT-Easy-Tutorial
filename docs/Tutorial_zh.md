@@ -106,9 +106,8 @@ else:
 1. 由于padding用0填充，因此(x > 0)表示生成一个shape同样为[batch_size, seq_len]的bool类型的序列，>0的为True，否则填充的位置为False，表示不可见
 2. unsqueeze(1)在维度1扩展，生成[batch_size, 1, seq_len]的序列
 3. repeat(1, x.size(1), 1)，在扩充出来的维度重复seq_len次，生成[batch_size, seq_len, seq_len]的序列
-4. unsqueeze(1)在继续维度1扩展，生成[batch_size, 1, seq_len, seq_len]的序列，这一步是提前扩充出来，为后面的multi-head做准备
 ```python
-mask = (x > 0).unsqueeze(1).repeat(1, x.size(1), 1).unsqueeze(1)
+mask = (x > 0).unsqueeze(1).repeat(1, x.size(1), 1)
 ```
 
 ### TokenEmbedding
