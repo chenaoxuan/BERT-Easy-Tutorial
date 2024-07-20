@@ -13,7 +13,7 @@
       * [构建输入](#构建输入-1)
       * [构建目标](#构建目标-1)
     * [随机选择子句的实现方式](#随机选择子句的实现方式)
-  * [Bert](#bert)
+  * [BERT模型](#bert模型)
     * [输入](#输入)
     * [生成mask](#生成mask)
     * [三种编码](#三种编码)
@@ -26,6 +26,9 @@
     * [Encoder](#encoder)
       * [多头自注意力](#多头自注意力)
       * [前馈网络](#前馈网络)
+  * [BERTLM模型](#bertlm模型)
+    * [MaskedLanguageModel](#maskedlanguagemodel)
+    * [NextSentencePrediction](#nextsentenceprediction)
 <!-- TOC -->
 
 # 教程
