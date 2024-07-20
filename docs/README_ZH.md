@@ -20,7 +20,7 @@
 
 本项目开发使用的环境：
 ```shell
-Python 3.10.0
+# Python 3.10.0
 pip install torch==1.12.0 numpy==1.26.3
 ```
 

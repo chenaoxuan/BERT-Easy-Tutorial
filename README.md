@@ -22,7 +22,7 @@ This is a minimalist introductory tutorial on the **BERT** model proposed by Goo
 Environmental requirements: Python 3.x、Pytorch>0.4、Numpy  
 The environment used for the development of this project is:
 ```shell
-Python 3.10.0
+# Python 3.10.0
 pip install torch==1.12.0 numpy==1.26.3
 ```
 
@@ -32,7 +32,7 @@ Run ```prepare_vocab.py``` with default configuration to convert ```data/capus.t
 
 Run ```train.by``` with default configuration to start training!
 
-For detailed explanations of data and code, please refer to the <a ref="Tutorial. md">Tutorial</a>.
+For detailed explanations of data and code, please refer to the <a ref="Tutorial.md">Tutorial</a>.
 
 ## Reference
 
