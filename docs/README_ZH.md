@@ -26,7 +26,7 @@ pip install torch==1.12.0 numpy==1.26.3
 
 ## 🚀快速开始
 
-默认配置运行```prepare_vocab.py```，将data/corpus.txt转为data/vocab词表（非必须，vocab已经提供）。
+默认配置运行```prepare_vocab.py```，将```data/corpus.txt```转为```data/vocab```词表（非必须，vocab已经提供）。
 
 默认配置运行```train.py```，启动训练！
 

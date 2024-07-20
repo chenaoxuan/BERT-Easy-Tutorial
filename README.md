@@ -28,7 +28,7 @@ pip install torch==1.12.0 numpy==1.26.3
 
 ## 🚀Quickstart
 
-Run ```prepare_vocab.py``` with default configuration to convert data/capus.txt to a data/vocab (Optional as vocab is already provided).
+Run ```prepare_vocab.py``` with default configuration to convert ```data/capus.txt``` to a ```data/vocab``` (Optional as vocab is already provided).
 
 Run ```train.by``` with default configuration to start training!
 
