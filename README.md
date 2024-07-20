@@ -12,15 +12,27 @@ This is a minimalist introductory tutorial on the **BERT** model proposed by Goo
 
 - Ultra detailed comments: Each line of core code has an explanation.
 
+- Comprehensive tutorial documents: Detailed introduction to data pipeline in both Chinese and English.
+
 - No redundant code: No need for graphics card training, configuration loading, model saving, and other operations.
 
 - Easily configure environment: Only Python, Pytorch, Numpy are needed to run.
 
+## 💻Environment
+Environmental requirements: Python 3.x、Pytorch>0.4、Numpy  
+The environment used for the development of this project is:
+```shell
+Python 3.10.0
+pip install torch==1.12.0 numpy==1.26.3
+```
 
-## 💻How to Install?
+## 🚀Quickstart
 
-! TODO
+Run ```prepare_vocab.py``` with default configuration to convert data/capus.txt to a data/vocab (Optional as vocab is already provided).
 
+Run ```train.by``` with default configuration to start training!
+
+For detailed explanations of data and code, please refer to the <a ref="Tutorial. md">Tutorial</a>.
 
 ## Reference
 
