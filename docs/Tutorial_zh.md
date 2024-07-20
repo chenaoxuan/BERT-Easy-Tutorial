@@ -9,7 +9,7 @@
       * [segment_label](#segment_label)
     * [随机mask的具体实现](#随机mask的具体实现)
   * [任务二：预测两个子句是否来自同一个句子](#任务二预测两个子句是否来自同一个句子)
-    * [样例](#样例)
+    * [举例说明](#举例说明-1)
       * [构建输入](#构建输入-1)
       * [构建目标](#构建目标-1)
     * [随机选择子句的实现方式](#随机选择子句的实现方式)
@@ -42,35 +42,33 @@ I can stay [\t] here all night
 ## 建立词表
 
 为```data/corpus.txt```建立对应的词表vocab（需要额外引入一些特殊的token），词表的本质就是一个字典，实现由英文单词到数字的映射：  
-{'< pad >': 0, '< unk >': 1, '< eos >': 2, '< sos >': 3, '< mask >': 4, 'the': 5, 'I': 6, 'Welcome': 7, 'all': 8, 'can': 9, 'here': 10, 'jungle': 11, 'night': 12, 'stay': 13, 'to': 14}
-
-其中< pad >表示填充，< unk >表示未知，< eos >表示句子的开头，< sos >表示句子的结尾，< mask >表示被遮挡。
+{'< pad >': 0, '< unk >': 1, '< eos >': 2, '< sos >': 3, '< mask >': 4, 'the': 5, 'I': 6, 'Welcome': 7, 'all': 8, 'can': 9, 'here': 10, 'jungle': 11, 'night': 12, 'stay': 13, 'to': 14}  
+其中< pad >表示填充，< unk >表示未知，< sos >表示句子的开头，< eos >表示句子的结尾，< mask >表示被遮挡。
 
 该步骤由```prepare_vocab.py```完成，最终将词表保存为```data/vocab```。
 
 ## 任务一：随机mask并预测重建
-在Bert论文中，提出了两种训练任务。   
+在Bert论文中，提出了两种训练任务。
+
 第一个任务是随机将句子中的一些词给遮挡（mask）住，然后使Bert预测这些被遮挡的词原来是什么。
 
 ### 举例说明
 #### 构建输入
 1. 将Welcome to the	the jungle转为词表的index序列：7 14 5 和 5 11  
-2. 现在随机mask掉，序列变为：4 14 5 和 5 10 （即将7变为mask token，将11变为随机token）    
-3. 合并序列，并添加起始token，序列变为：3 4 14 5 2 5 10 2（需要注意的是，在前半句前后添加sos 3和eos 2，但是后半句只在最后添加eos 2）
+2. 现在随机mask掉一部分，序列变为：4 14 5 和 5 10 （即将7变为mask token，将11变为随机token）    
+3. 合并序列，并添加起止token，序列变为：3 4 14 5 2 5 10 2（需要注意的是，在前半句前后添加sos 3和eos 2，但是后半句只在最后添加eos 2）
 4. 填充到预定义长度：3 4 14 5 2 5 10 2 0 0 0 0 0 0 0 0 0 0 0 0（此处预设长度为20）
 
-至此，使用tokens构建完了Bert任务一的输入序列，即```bert/dataset/dataset.py```中的```bert_input```（注意，只是展示了前后两端来自同一个句子的情况，也可能任务二中使用Welcome to the和here all night进行组合，但是这并不影响整个流程）
+至此，构建完了Bert任务一的输入序列，即```bert/dataset/dataset.py```中的```bert_input```（注意，只是展示了前后两端来自同一个句子的情况，也可能任务二中使用Welcome to the和here all night进行组合，但是这并不影响整个流程）
 
 #### 构建目标
 在构建输入中可知，将7变为mask token 4，将11变为随机token 10，这两个变化需要Bert将其重新预测为原来的值，因此构建目标target为0 7 0 0 0 0 11 0 0 0 0 0 0 0 0 0 0 0 0 0（注意，sos和eos的位置用padding的0代替）
 
 至此，生成了Bert任务一的目标序列，即```bert/dataset/dataset.py```中的```bert_label```。
 
-
 #### segment_label
 表明当前的单词来自哪里，例如：1 1 1 1 1 2 2 2 0 0 0 0 0 0 0 0 0 0 0 0  
 若为1，则表示token来自前半段（前半个子句）；若为2，则表示token来自后半段（后半个子句）；若为0，则表示token来自padding。这一项在Bert模型的编码中需要使用。
-
 
 ### 随机mask的具体实现
 以15%的概率随机mask，具体逻辑为：
@@ -97,11 +95,10 @@ for i,word in enumerate(sentence):
 ```
 通过这种方式构造出tokens，即英文单词在vocab字典中的位置索引序列；和output_label，即Bert的任务一需要预测的target。
 
-
 ## 任务二：预测两个子句是否来自同一个句子
-通过\t可以将数据集的某一行句子拆分为两个子句。第二个任务有0%的概率选择不是来自同一个句子的子句，让Bert进行预测其来源。
+通过\t可以将数据集的某一行句子拆分为两个子句。第二个任务有50%的概率选择不是来自同一个句子的子句，让Bert进行预测其来源。
 
-### 样例
+### 举例说明
 #### 构建输入
 1. 根据传入的行号，读取数据集中的某一整行，并通过\t分为两个子句，如t1=Welcome to the，t2=the jungle
 2. 有50%的概率将t2换为来自其他行的子句，如可以将t2更换为here all night
@@ -109,10 +106,9 @@ for i,word in enumerate(sentence):
 即任务一构建输入中的bert_input，具体代码可查看```bert/dataset/dataset.py```中的__getitem__方法
 
 #### 构建目标
-若bert_input由来自同一个句子的t1和t2构成，则为1；否则为0.
+若bert_input由来自同一个句子的t1和t2构成，则目标为1；否则为0。
 
 至此，构建为了```bert/dataset/dataset.py```中的is_next_label
-
 
 ### 随机选择子句的实现方式
 ```python
@@ -122,7 +118,6 @@ if random.random() > 0.5:
 else:
     return t1, get_random_line(), 0 # 50%的概率返回来自不同句子的两个子句，并标记为0
 ```
-
 
 ## BERT模型
 ```bert/model/bert.py/BERT```
@@ -158,7 +153,7 @@ TokenEmbedding
 
 #### Position编码
 ```bert/model/embedding/position.py```   
-Bert使用表示绝对位置的正余弦编码，可以在init方法中提前预处理出一个shape为[max_len, hidden(即d_model)的位置编码map，然后在forward中只截取前token_len个返回即可。因此，传参初始化时，必须传递hidden，可以不传递max_len
+Bert使用表示绝对位置的正余弦编码，可以在init方法中提前预处理出一个shape为[max_len, hidden(即d_model)]的位置编码map，然后在forward中只截取前seq_len个返回即可。因此，传参初始化时，必须传递hidden，可以不传递max_len
 
 ##### 初始化
 核心公式
@@ -167,9 +162,9 @@ $$ PE(pos,2i)=sin(pos/10000^{2i/dim}) $$
 
 $$ PE(pos,2i+1)=cos(pos/10000^{2i/dim}) $$
 
-其中pos表示单词在token序列中的位置，取值范围0 ~ token_len；i表示维度的位置，取值0 ~ dim；dim表示维度长度
+其中pos表示单词在token序列中的位置，取值范围0 ~ seq_len；i表示维度的位置，取值0 ~ dim；dim表示维度长度
 
-1. 首先创建[max_len, d_model]的全0tensor，后续在这上面做修改
+1. 首先创建[max_len, d_model]的全0 tensor，后续在这上面做修改
 ```python
 pe = torch.zeros(max_len, d_model).float()
 ```
@@ -235,7 +230,6 @@ QKV分别通过三个线性层对输入x进行变换得到。
 
 $$ output=softmax(\frac{Q \cdot K^T}{\sqrt{dim}}) \cdot V $$
 
-
 #### 前馈网络
 ```bert/model/utils/feed_forward.py```
 由两个线性层并配合激活函数和LayerNorm构成。
@@ -250,10 +244,10 @@ $$ output=softmax(\frac{Q \cdot K^T}{\sqrt{dim}}) \cdot V $$
 ### MaskedLanguageModel
 在shape为[batch_size, seq_len, hidden]的x上应用线性层，变为[batch_size, seq_len, vocab_size]，并对最后一个维度使用softmax。
 
-此时，为序列中的每一个token都预测出了一个词表中的单词。在**train.py**中使用nn.NLLLoss(ignore_index=0)对预测的单词和bert_label进行损失计算，ignore_index=0表示忽略bert_label中为0的项（即没有mask掉的那些）
+此时，为序列中的每一个token都预测出了一个词表中的单词。在```train.py```中使用nn.NLLLoss(ignore_index=0)对预测的单词和bert_label进行损失计算，ignore_index=0表示忽略bert_label中为0的项（即没有mask掉的那些）
 
 ### NextSentencePrediction
 
 在shape为[batch_size, seq_len, hidden]的x上应用线性层，变为[batch_size, seq_len, 2]，并只使用序列中的第0个（因为这个任务只需要预测子句来源是否一致，只需要一个输出即可），即[:,0]，应用softmax后返回。
 
-在**train.py**中使用nn.NLLLoss()对预测的二分类结果和is_next_label进行损失计算
+在```train.py```中使用nn.NLLLoss()对预测的二分类结果和is_next_label进行损失计算
