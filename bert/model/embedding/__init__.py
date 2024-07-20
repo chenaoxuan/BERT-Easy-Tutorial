@@ -1,3 +1,3 @@
-from .position import PositionalEmbedding
+from .position import PositionEmbedding
 from .segment import SegmentEmbedding
 from .token import TokenEmbedding

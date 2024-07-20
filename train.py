@@ -15,7 +15,7 @@ def get_args() -> argparse.Namespace:
     parser.add_argument("-v", "--vocab_path", type=str, default="data/vocab", help="vocab path after prepare_vocab.py")
 
     parser.add_argument("-hs", "--hidden", type=int, default=256, help="hidden size of bert model")
-    parser.add_argument("-l", "--layers", type=int, default=8, help="number of layers")
+    parser.add_argument("-l", "--layers", type=int, default=6, help="number of layers")
     parser.add_argument("-a", "--attn_heads", type=int, default=8, help="number of transformer heads")
     parser.add_argument("-s", "--seq_len", type=int, default=20, help="maximum sequence len")
 

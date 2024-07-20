@@ -6,6 +6,9 @@ English</a> | <a href="docs/README_ZH.md">简体中文</a>
 
 This is a minimalist introductory tutorial on the **BERT** model proposed by Google AI Language in 2018, designed to guide beginners to understand BERT at the fastest speed possible.
 
+> BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding    
+> Paper Link: https://arxiv.org/abs/1810.04805
+
 ## 🚩Features
 
 - Ultra simplified data: A dataset consisting of only two lines of text.

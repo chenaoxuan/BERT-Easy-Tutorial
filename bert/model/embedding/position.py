@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 
 
-class PositionalEmbedding(nn.Module):
+class PositionEmbedding(nn.Module):
 
     def __init__(self, d_model, max_len=512):
         super().__init__()

@@ -6,6 +6,9 @@
 
 这是一个关于2018年Google AI Language提出的**BERT**模型的极简入门教程，用于带领初学者以最快的速度了解BERT。
 
+> BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding    
+> Paper Link: https://arxiv.org/abs/1810.04805
+
 ## 🚩特点
 
 - 超精简的数据：仅由两行文本构成数据集。
