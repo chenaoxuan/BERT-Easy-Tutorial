@@ -32,7 +32,7 @@ Run ```prepare_vocab.py``` with default configuration to convert ```data/capus.t
 
 Run ```train.by``` with default configuration to start training!
 
-For detailed explanations of data and code, please refer to the <a ref="Tutorial.md">Tutorial</a>.
+For detailed explanations of data and code, please refer to the <a ref="docs/Tutorial.md">Tutorial</a>.
 
 ## Reference
 
