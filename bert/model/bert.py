@@ -70,7 +70,8 @@ class BERTLM(nn.Module):
 
     def forward(self, x, segment_label):
         x = self.bert(x, segment_label)
-        return self.next_sentence(x), self.mask_lm(x)
+        return self.mask_lm(x), self.next_sentence(x)
+
 
 class MaskedLanguageModel(nn.Module):
     """
@@ -106,6 +107,3 @@ class NextSentencePrediction(nn.Module):
 
     def forward(self, x):
         return self.softmax(self.linear(x[:, 0]))
-
-
-

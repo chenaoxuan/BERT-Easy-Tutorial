@@ -45,7 +45,8 @@ if __name__ == '__main__':
     bert = BERT(len(vocab), hidden=args.hidden, n_layers=args.layers, attn_heads=args.attn_heads)
     model = BERTLM(bert, len(vocab))
 
-    criterion = nn.NLLLoss(ignore_index=0)
+    criterion_mask = nn.NLLLoss(ignore_index=0)
+    criterion_sent = nn.NLLLoss()
     optimizer = Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
 
     for cur_epoch in range(args.epochs):
@@ -55,16 +56,16 @@ if __name__ == '__main__':
         for i, data in enumerate(train_loader):
 
             # 1. forward the next_sentence_prediction and masked_lm model
-            next_sent_output, mask_lm_output = model.forward(data["bert_input"], data["segment_label"])
+            mask_lm_output, next_sent_output = model.forward(data["bert_input"], data["segment_label"])
 
-            # 2-1. NLL(negative log likelihood) loss of is_next classification result
-            next_loss = criterion(next_sent_output, data["is_next"])
+            # 2-1. NLLLoss of predicting masked token word
+            mask_loss = criterion_mask(mask_lm_output.transpose(1, 2), data["bert_label"])
 
-            # 2-2. NLLLoss of predicting masked token word
-            mask_loss = criterion(mask_lm_output.transpose(1, 2), data["bert_label"])
+            # 2-2. NLL(negative log likelihood) loss of is_next classification result
+            next_loss = criterion_sent(next_sent_output, data["is_next"])
 
             # 2-3. Adding next_loss and mask_loss : 3.4 Pre-training Procedure
-            loss = next_loss + mask_loss
+            loss = mask_loss + next_loss
 
             # 3. backward and optimization only in train
             optimizer.zero_grad()

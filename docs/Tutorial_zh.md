@@ -121,7 +121,9 @@ else:
 ```
 
 
-## Bert
+## BERT模型
+```bert/model/bert.py/BERT```
+
 从主要结构上来看，Bert对输入首先进行三种编码：
 1. token编码，将输入的字典索引序列编码为稠密特征嵌入
 2. position编码，生成序列的位置编码，区分token的位置
@@ -129,7 +131,7 @@ else:
 
 然后进行多层的Transformer-Encoder结构，用于提取特征
 
-下面我们只关注Bert模型的forward部分，即```bert/model/bert.py/BERT/forward```
+下面我们只关注Bert模型的forward部分
 ### 输入
 - x：shape为[batch_size, seq_len]的序列，seq_len默认设置为了20，表示随机mask和padding后的index序列
 - segment_info：shape为[batch_size, seq_len]的序列，seq_len默认设置为了20，值为1表示当前token来自前半句，值为2表示当前token来自后半句，值为0表示当前token为padding的
@@ -236,3 +238,19 @@ $$ output=softmax(\frac{Q \cdot K^T}{\sqrt{dim}}) \cdot V $$
 由两个线性层并配合激活函数和LayerNorm构成。
 
 核心要点是第一个线性层之后，特征通道数增加；第二个线性层后，特征通道数又变回为原来的样子。
+
+## BERTLM模型
+```bert/model/bert.py/BERTLM```
+
+这个模型是对BERT模型的进一步封装。在上面的介绍中，Bert只用来提取特征，但是并未对两个训练任务做出预测。BERTLM通过进一步的封装，实现了对两个任务的预测输出。
+
+### MaskedLanguageModel
+在shape为[batch_size, seq_len, hidden]的x上应用线性层，变为[batch_size, seq_len, vocab_size]，并对最后一个维度使用softmax。
+
+此时，为序列中的每一个token都预测出了一个词表中的单词。在**train.py**中使用nn.NLLLoss(ignore_index=0)对预测的单词和bert_label进行损失计算，ignore_index=0表示忽略bert_label中为0的项（即没有mask掉的那些）
+
+### NextSentencePrediction
+
+在shape为[batch_size, seq_len, hidden]的x上应用线性层，变为[batch_size, seq_len, 2]，并只使用序列中的第0个（因为这个任务只需要预测子句来源是否一致，只需要一个输出即可），即[:,0]，应用softmax后返回。
+
+在**train.py**中使用nn.NLLLoss()对预测的二分类结果和is_next_label进行损失计算
